@@ -1,4 +1,4 @@
 # IGAutoComent
 Instagram Auto Comments
 <br>
-<b>Usage: ```python3 igmen.py```</b>
+<b>Usage: </b>```python3 igmen.py```
