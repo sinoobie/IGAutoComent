@@ -47,9 +47,18 @@ class Menig:
 		myid=[]
 		msg=input("Commnets: ")
 		count=int(input("Commnets Loop: "))
-		mauapa=input("do you want spam specific post? [y/n] ")
+		mauapa=input("do you want spam specific post? [y/N] ")
 
-		if mauapa.lower() == 'n':
+		if mauapa.lower() == 'y':
+			inlnk=input("Link post: ")
+			cek=self.req.get(inlnk)
+			if "the page may have been removed" in cek.text:
+				print("Invalid username. Try again!\n")
+				self.grep()
+			mid=re.findall('"id":"..................[0-9]',cek.text)[0].replace('"id":"','')
+			self.send(mid,msg,count)
+
+		else:
 			tar=input("Target account: ")
 			cek=self.req.get("https://www.instagram.com/"+tar)
 			if "the page may have been removed" in cek.text:
@@ -58,26 +67,17 @@ class Menig:
 			mid=re.findall('"id":"..................[0-9]',cek.text)
 			print()
 
-			maugak=input(f"success get [{len(mid)}] media id\nwant to spam all? [y/n] ")
-			if maugak.lower() == 'n':
+			maugak=input(f"success get [{len(mid)}] media id\nwant to spam all? [y/N] ")
+			if maugak.lower() == 'y':
+				for x in mid:
+					self.send(x.replace('"id":"',''),msg,count)
+			else:
 				for i in mid:
 					print("#"+str(C),i.replace('"id":"',''))
 					myid.append(i.replace('"id":"',''))
 					C+=1
 				pil=int(input("Choice: "))
 				self.send(myid[pil-1],msg,count)
-			elif maugak.lower() == 'y':
-				for x in mid:
-					self.send(x.replace('"id":"',''),msg,count)
-
-		elif mauapa.lower() == 'y':
-			inlnk=input("Link post: ")
-			cek=self.req.get(inlnk)
-			if "the page may have been removed" in cek.text:
-				print("Invalid username. Try again!\n")
-				self.grep()
-			mid=re.findall('"id":"..................[0-9]',cek.text)[0].replace('"id":"','')
-			self.send(mid,msg,count)
 		sys.exit()
 
 	def send(self,idku,msg,count):
@@ -95,12 +95,6 @@ class Menig:
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'X-Requested-With': 'XMLHttpRequest',
 			'Connection': 'close' }
-		cookies={'csrftoken': self.log.cookies['csrftoken'],
-			'shbid': self.log.cookies['shbid'],
-			'ds_user_id': self.log.cookies['ds_user_id'],
-			'sessionid': self.log.cookies['sessionid'],
-			'rur': self.log.cookies['rur'],
-			'shbts': self.log.cookies['shbts']}
 
 		print()
 		cc=1
@@ -114,10 +108,8 @@ class Menig:
 				print()
 			elif '"status": "ok"' in preq.text:
 				print(f"{cc}. Spam succesfully [{idku}]")
-#			else:
-#				print("!Error!")
 			cc+=1
-			time.sleep(1.5)
+			time.sleep(2)
 
 try:
 	os.system('clear')
