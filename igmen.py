@@ -45,7 +45,7 @@ class Menig:
 	def grep(self):
 		C=1
 		myid=[]
-		msg=input("Commnets: ")
+		msg=input("[info] use '\\n' for new line comments\nCommnets: ").replace('\\n','\n')
 		count=int(input("Commnets Loop: "))
 		mauapa=input("do you want spam specific post? [y/N] ")
 
@@ -78,7 +78,8 @@ class Menig:
 					C+=1
 				pil=int(input("Choice: "))
 				self.send(myid[pil-1],msg,count)
-		sys.exit()
+		return True
+#		sys.exit()
 
 	def send(self,idku,msg,count):
 		load = {'comment_text' : msg,
@@ -108,6 +109,8 @@ class Menig:
 				print()
 			elif '"status": "ok"' in preq.text:
 				print(f"{cc}. Spam succesfully [{idku}]")
+			else:
+				print(preq.text)
 			cc+=1
 			time.sleep(2)
 
