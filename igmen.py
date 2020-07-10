@@ -30,9 +30,11 @@ class Menig:
 			'x-requested-with': 'XMLHttpRequest'
 			}, data={
 			'username': user,
-			'password': pas,
+			'enc_password':f'#PWD_INSTAGRAM_BROWSER:0:{int(time.time())}:{pas}',
 			'queryParams': '{}'
 			})
+
+		print(self.log.text)
 
 		if '"authenticated": true' in self.log.text:
 			print("Login succesfully\n")
@@ -52,8 +54,8 @@ class Menig:
 		if mauapa.lower() == 'y':
 			inlnk=input("Link post: ")
 			cek=self.req.get(inlnk)
-			if "the page may have been removed" in cek.text:
-				print("Invalid username. Try again!\n")
+			if "<title>\nInstagram\n</title>" in cek.text:
+				print("Invalid post url. Try again!\n")
 				self.grep()
 			mid=re.findall('"id":"..................[0-9]',cek.text)[0].replace('"id":"','')
 			self.send(mid,msg,count)
@@ -61,7 +63,7 @@ class Menig:
 		else:
 			tar=input("Target account: ")
 			cek=self.req.get("https://www.instagram.com/"+tar)
-			if "the page may have been removed" in cek.text:
+			if "<title>\nInstagram\n</title>" in cek.text:
 				print("Invalid username. Try again!\n")
 				self.grep()
 			mid=re.findall('"id":"..................[0-9]',cek.text)
@@ -70,7 +72,10 @@ class Menig:
 			maugak=input(f"success get [{len(mid)}] media id\nwant to spam all? [y/N] ")
 			if maugak.lower() == 'y':
 				for x in mid:
-					self.send(x.replace('"id":"',''),msg,count)
+					self.send(x.replace('"id":"',''),msg,count,all=True)
+				print("[✓] All done.\n")
+				time.sleep(3)
+				self.grep()
 			else:
 				for i in mid:
 					print("#"+str(C),i.replace('"id":"',''))
@@ -81,7 +86,7 @@ class Menig:
 		return True
 #		sys.exit()
 
-	def send(self,idku,msg,count):
+	def send(self,idku,msg,count,all=False):
 		load = {'comment_text' : msg,
 		'replied_to_comment_id=' : '',}
 		head={'Accept': '*/*',
@@ -103,8 +108,8 @@ class Menig:
 			preq = self.req.post('https://www.instagram.com/web/comments/{}/add/'.format(idku),headers=head,data=load)
 			if preq.text == "Please wait a few minutes before you try again.":
 				print(f"{cc}. Spam failed [{idku}]")
-				for i in range(120):
-					print(end=f"\r >> sleep {120-(i+1)}s << ",flush=True)
+				for i in range(60):
+					print(end=f"\r >> sleep {60-(i+1)}s << ",flush=True)
 					time.sleep(1)
 				print()
 			elif '"status": "ok"' in preq.text:
@@ -112,7 +117,12 @@ class Menig:
 			else:
 				print(preq.text)
 			cc+=1
-			time.sleep(2)
+			time.sleep(5)
+
+		if not all:
+			print("[✓] All done.\n")
+			time.sleep(3)
+			self.grep()
 
 try:
 	os.system('clear')
