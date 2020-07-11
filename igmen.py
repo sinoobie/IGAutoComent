@@ -1,12 +1,15 @@
-# Rewrite / Recode to python3
-# Original source: https://github.com/thelinuxchoice/instaspam
+# Python3
+# Author : KANG-NEWBIE (noobie)
+# Version: 2.0
+
+# Have fun and nice day ;) UwU
 
 try:
 	import requests,os,sys,time,readline,re
 	from prompt_toolkit import prompt
 except:
 	import os,sys,time
-	print("[!] requests and prompt_toolkit not installed\n[!] installing module requirement")
+	print("[!] requests or prompt_toolkit not installed\n[!] installing module requirement")
 	time.sleep(1.5)
 	os.system('python3 -m pip install requests prompt_toolkit;python3 '+sys.argv[0])
 	sys.exit()
@@ -19,8 +22,8 @@ class Menig:
 		self.login()
 
 	def login(self):
-		user=input("You Username: ")
-		pas=prompt("You Password: ", is_password=True)
+		user=input("[In] Your Username: ")
+		pas=prompt("[In] Your Password: ", is_password=True)
 		self.log = self.req.post('https://www.instagram.com/accounts/login/ajax/', headers={
 			'origin': 'https://www.instagram.com',
 			'pragma': 'no-cache',
@@ -37,39 +40,41 @@ class Menig:
 		print(self.log.text)
 
 		if '"authenticated": true' in self.log.text:
-			print("Login succesfully\n")
+			print("[✓] Login succesfully\n")
 			self.grep()
 		else:
-			print("Login failed. Try Again!")
+			print("[X] Login failed. Try Again!")
 			time.sleep(2)
 			self.login()
 
 	def grep(self):
 		C=1
 		myid=[]
-		msg=input("[info] use '\\n' for new line comments\nCommnets: ").replace('\\n','\n')
-		count=int(input("Commnets Loop: "))
-		mauapa=input("do you want spam specific post? [y/N] ")
+		msg=input("[info] use '\\n' for new line comments\n[In] Commnets: ").replace('\\n','\n')
+		count=int(input("[In] Commnets Loop: "))
+		mauapa=input("[?] do you want spam specific post? [y/N] ")
 
 		if mauapa.lower() == 'y':
-			inlnk=input("Link post: ")
+			inlnk=input("[In] Link post: ")
 			cek=self.req.get(inlnk)
 			if "<title>\nInstagram\n</title>" in cek.text:
-				print("Invalid post url. Try again!\n")
+				print("[!] Invalid post url. Try again!\n")
 				self.grep()
 			mid=re.findall('"id":"..................[0-9]',cek.text)[0].replace('"id":"','')
 			self.send(mid,msg,count)
 
 		else:
-			tar=input("Target account: ")
+			tar=input("[In] Target account: ")
 			cek=self.req.get("https://www.instagram.com/"+tar)
 			if "<title>\nInstagram\n</title>" in cek.text:
-				print("Invalid username. Try again!\n")
+				print("[!] Invalid username. Try again!\n")
 				self.grep()
 			mid=re.findall('"id":"..................[0-9]',cek.text)
-			print()
+			if len(mid) == 0:
+				print("[!] This account does not have any posts or maybe this is a private account. Try again!\n")
+				self.grep()
 
-			maugak=input(f"success get [{len(mid)}] media id\nwant to spam all? [y/N] ")
+			maugak=input(f"\nsuccess get [{len(mid)}] media id\n[?] want to spam all? [y/N] ")
 			if maugak.lower() == 'y':
 				for x in mid:
 					self.send(x.replace('"id":"',''),msg,count,all=True)
@@ -81,7 +86,7 @@ class Menig:
 					print("#"+str(C),i.replace('"id":"',''))
 					myid.append(i.replace('"id":"',''))
 					C+=1
-				pil=int(input("Choice: "))
+				pil=int(input("[In] Choice: "))
 				self.send(myid[pil-1],msg,count)
 		return True
 #		sys.exit()
@@ -126,7 +131,7 @@ class Menig:
 
 try:
 	os.system('clear')
-	print("""
+	print("""\033[0;97m
 		###########################
 		# Instagram Auto Comments #
 		###########################
@@ -134,6 +139,6 @@ try:
 		""")
 	Menig()
 except KeyboardInterrupt:
-	sys.exit("\nInterrupt: exit the program")
+	sys.exit("\n\033[93mInterrupt: exit the program")
 except Exception as Err:
-	print(f"Error: {Err}")
+	print(f"\033[91mError: {Err}")
